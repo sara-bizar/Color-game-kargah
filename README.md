@@ -8,10 +8,10 @@ In this game, the player must enter the **color of the text** that appears on th
 </div>
 
 ## Implementation
-- [*] Designing and implementing a graphic user interface, including displaying words with different colors.
-- [*] Incoming player recognition mechanism and score calculation.
-- [*] Scheduling the game and checking the end of the game(30 seconds).
-- [*] Buttons with Play and Restart functions on the game screen.
+- [x] Designing and implementing a graphic user interface, including displaying words with different colors.
+- [x] Incoming player recognition mechanism and score calculation.
+- [x] Scheduling the game and checking the end of the game(30 seconds).
+- [x] Buttons with Play and Restart functions on the game screen.
 - [ ] Show the number of times played and the highest score
 
 ## Getting started
