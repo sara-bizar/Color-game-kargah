@@ -44,6 +44,7 @@ class ColorGame:
     def start_game(self, name):
         self.user_name = name
         self.welcome_window.pack_forget()
+        self.welcome_window.update_button()
         self.game_window.pack()
         self.game_window.start_game()
         self.game_window.update_window(name)
@@ -90,12 +91,15 @@ class WelcomeWindow(tk.Frame):
 
     def update_chart(self):
         self.listbox.delete(0, tk.END)
-        self.listbox.insert(tk.END, "User - Score")
+        self.listbox.insert(tk.END, "User - Score - Trys")
         for user, score in self.app.score.items():
             color = random.choice(list(self.app.colors.keys()))
             padding = " " * (10 - len(f"{user} - {score}"))
             self.listbox.insert(tk.END, f"{user} - {score}{padding}")
             self.listbox.itemconfig(tk.END, {"fg": color})
+
+    def update_button(self):
+        self.start_button.config(text="Retry!")
 
 
 # Game Window Class
