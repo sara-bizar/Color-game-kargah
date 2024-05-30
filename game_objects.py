@@ -45,6 +45,7 @@ class ColorGame:
         self.user_name = name
         self.welcome_window.pack_forget()
         self.game_window.pack()
+        self.game_window.start_game()
         self.game_window.update_window(name)
         self.game_window.start_timer()
 
@@ -88,6 +89,7 @@ class WelcomeWindow(tk.Frame):
             self.app.start_game(name)
 
     def update_chart(self):
+        self.listbox.delete(0, tk.END)
         self.listbox.insert(tk.END, "User - Score")
         for user, score in self.app.score.items():
             color = random.choice(list(self.app.colors.keys()))
@@ -101,7 +103,7 @@ class GameWindow(tk.Frame):
     def __init__(self, app):
         super().__init__(app.window)
         self.app = app
-        self.current_score = 0
+
         self.remaining_time = 30  # 30 seconds timer
         self.current_score_label = tk.Label(self, text="", font=("Helvetica", 10))
         self.current_score_label.pack(pady=20)
@@ -187,3 +189,6 @@ class GameWindow(tk.Frame):
             )
             self.app.save_scores()
             self.app.show_welcome_window()  # Time's up, return to welcome window
+
+    def start_game(self):
+        self.current_score = 0
