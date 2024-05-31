@@ -1,8 +1,10 @@
 import tkinter as tk
 from game_objects import *
+from data import *
 
 
 if __name__ == "__main__":
     window = tk.Tk()
-    app = ColorGame(window)
+    manager = UserDataManager()
+    app = ColorGame(window, manager)
     window.mainloop()
