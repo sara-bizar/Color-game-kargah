@@ -1,5 +1,4 @@
 import tkinter as tk
-import json
 import random
 
 
@@ -9,7 +8,7 @@ class ColorGame:
         self.window = window
         self.manager = manager
         self.window.title("Color Game Application")
-        width, height = 900, 900
+        width, height = 1300, 1100
         self.window.geometry(f"{width}x{height}")
         self.window.minsize(300, 200)
         self.window.maxsize(900, 600)
@@ -20,7 +19,7 @@ class ColorGame:
 
         self.user_name = ""
         self.best_score = 0
-        self.trys = 0
+        self.trys = 1
 
         self.welcome_window = WelcomeWindow(self)
         self.game_window = GameWindow(self)
@@ -61,15 +60,18 @@ class WelcomeWindow(tk.Frame):
         self.listbox.pack(padx=10, pady=10)
 
         self.name_label = tk.Label(
-            self, text=f"please enter your name:", font=("Helvetica", 10, "bold")
+            self, text=f"please enter your name:", font=("Helvetica", 15, "bold")
         )
-        self.name_label.pack(pady=20)
+        self.name_label.pack(pady=5)
 
-        self.name_entry = tk.Entry(self, font=("Helvetica", 10))
+        self.name_entry = tk.Entry(self, font=("Helvetica", 15))
         self.name_entry.pack(pady=10)
 
         self.start_button = tk.Button(
-            self, text="Get Started!", font=("Helvetica", 10), command=self.start_game
+            self,
+            text="Get Started!",
+            font=("Helvetica", 10, "bold"),
+            command=self.start_game,
         )
         self.start_button.pack(pady=10)
 
@@ -103,15 +105,15 @@ class GameWindow(tk.Frame):
         self.app = app
 
         self.remaining_time = 30  # 30 seconds timer
-        self.current_score_label = tk.Label(self, text="", font=("Helvetica", 10))
-        self.current_score_label.pack(pady=20)
+        self.info_label = tk.Label(self, text="", font=("Helvetica", 10))
+        self.info_label.pack(pady=10)
 
         self.timer_label = tk.Label(
             self,
             text=f"Time remaining: {self.remaining_time} seconds",
-            font=("Helvetica", 10),
+            font=("Helvetica", 10, "bold"),
         )
-        self.timer_label.pack(pady=10)
+        self.timer_label.pack(pady=5)
 
         self.pick_colors()
         self.backScreen = tk.Frame(
@@ -123,7 +125,7 @@ class GameWindow(tk.Frame):
         self.text = tk.Label(
             self.backScreen,
             text=self.realText,
-            font=("Calibri", 90, "bold"),
+            font=("Calibri", 80, "bold"),
             fg=next(
                 (code for name, code in self.app.colors if name == self.textColor), None
             ),
@@ -134,12 +136,17 @@ class GameWindow(tk.Frame):
         self.backScreen.pack(fill="both", expand=True)
         self.text.pack(pady=100)
 
-        self.label = tk.Label(self, text="Enter a word:", font=("Helvetica", 10))
-        self.label.pack(pady=10)
-        self.entry = tk.Entry(self, font=("Helvetica", 10))
-        self.entry.pack(pady=10)
+        self.label = tk.Label(
+            self, text="Enter your color guess:", font=("Helvetica", 15, "bold")
+        )
+        self.label.pack(pady=5)
+        self.entry = tk.Entry(self, font=("Helvetica", 15))
+        self.entry.pack(pady=5)
         self.button = tk.Button(
-            self, text="Check", font=("Helvetica", 10), command=self.check_answer
+            self,
+            text="Check",
+            font=("Helvetica", 10, "bold"),
+            command=self.check_answer,
         )
         self.button.pack(pady=10)
 
@@ -159,16 +166,16 @@ class GameWindow(tk.Frame):
     def check_answer(self):
         user_input = self.entry.get().lower()  # Get input and convert to lowercase
         if user_input == self.textColor:
-            self.result_label.config(text="You win!")
+            self.result_label.config(text="Correct!")
             self.current_score += 1
         else:
-            self.result_label.config(text="You lost!")
+            self.result_label.config(text="Wrong!")
         self.update_window(self.user_name)
 
     def update_window(self, name):
         self.user_name = name
-        self.current_score_label.config(
-            text=f"score: {self.current_score}\nbest score: {max(self.app.best_score, self.current_score)}"
+        self.info_label.config(
+            text=f"gamer: {self.user_name}\nscore: {self.current_score}\nbest score: {max(self.app.best_score, self.current_score)}"
         )
         self.pick_colors()
 
@@ -209,3 +216,4 @@ class GameWindow(tk.Frame):
 
     def start_game(self):
         self.current_score = 0
+        self.result_label.config(text="")
