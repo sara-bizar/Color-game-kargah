@@ -1,21 +1,20 @@
 import tkinter as tk
 import random
+import json
+import os
 
 
 # Main Application Class
 class ColorGame:
-    def __init__(self, window, manager):
+    def __init__(self, window):
         self.window = window
-        self.manager = manager
         self.window.title("Color Game Application")
         width, height = 1300, 1100
         self.window.geometry(f"{width}x{height}")
         self.window.minsize(300, 200)
         self.window.maxsize(900, 600)
-        self.manager.create_table_users()
-        self.manager.create_colors_table()
-        self.scores = self.manager.retrieve_user_data()
-        self.colors = self.manager.retrieve_all_colors()
+        self.scores = self.retrieve_user_data()
+        self.colors = self.retrieve_all_colors()
 
         self.user_name = ""
         self.best_score = 0
@@ -26,24 +25,46 @@ class ColorGame:
 
         self.show_welcome_window()
 
+    def retrieve_user_data(self):
+        file_path = os.path.join("data", "scores.json")
+        with open(file_path, "r") as file:
+            self.scores = sorted(
+                json.load(file).items(), key=lambda x: x[1]["scores"], reverse=True
+            )
+            self.scores = {k: v for k, v in self.scores}
+            file.close()
+        return self.scores
+
+    def retrieve_all_colors(self):
+        file_path = os.path.join("data", "colors.json")
+        with open(file_path, "r") as file:
+            self.colors = json.load(file)
+            file.close()
+        return self.colors
+
     def show_welcome_window(self):
-        self.scores = self.manager.retrieve_user_data()
+        self.scores = self.retrieve_user_data()
         self.game_window.pack_forget()
         self.welcome_window.pack()
         self.welcome_window.update_chart()
 
     def start_game(self, name):
         self.user_name = name
-        for username, score, trys in self.scores:
+        for username, i in self.scores.items():
             if username == name:
-                self.best_score = score
-                self.trys = trys + 1
+                self.best_score = i["scores"]
+                self.trys = i["trys"] + 1
         self.welcome_window.pack_forget()
         self.welcome_window.update_button()
         self.game_window.pack()
         self.game_window.start_game()
         self.game_window.update_window(name)
         self.game_window.start_timer()
+
+    def save_scores(self):
+        file_path = os.path.join("data", "scores.json")
+        with open(file_path, "w") as file:
+            json.dump(self.scores, file)
 
 
 # Welcome Window Class
@@ -77,21 +98,23 @@ class WelcomeWindow(tk.Frame):
 
     def start_game(self):
         name = self.name_entry.get()
+
         if name:
-            if not (name in [i[0] for i in self.app.scores]):
-                self.app.manager.store_user_data(name, 0, 1)
+            if not (name in list(self.app.scores.keys())):
+                self.app.score[name] = 0
+                self.app.save_scores()
             self.app.start_game(name)
 
-    def on_delete(self, name):
-        print(f"deleted {name}")
-
     def update_chart(self):
-        self.app.scores = sorted(self.app.scores, key=lambda x: x[1], reverse=True)
+        self.app.scores = sorted(
+            self.app.scores.items(), key=lambda x: x[1]["scores"], reverse=True
+        )
+        self.app.scores = {k: v for k, v in self.app.scores}
         self.listbox.delete(0, tk.END)
         self.listbox.insert(tk.END, "User - Score - Trys")
-        for user, score, trys in self.app.scores:
-            color = random.choice([i[0] for i in self.app.colors])
-            self.listbox.insert(tk.END, f"{user} - {score} - {trys}")
+        for user, i in self.app.scores.items():
+            color = random.choice(list(self.app.colors.keys()))
+            self.listbox.insert(tk.END, f"{user} - {i['scores']} - {i['trys']}")
             self.listbox.itemconfig(tk.END, {"fg": color})
 
     def update_button(self):
@@ -116,22 +139,13 @@ class GameWindow(tk.Frame):
         self.timer_label.pack(pady=5)
 
         self.pick_colors()
-        self.backScreen = tk.Frame(
-            self,
-            background=next(
-                (code for name, code in self.app.colors if name == self.bgColor), None
-            ),
-        )
+        self.backScreen = tk.Frame(self, background=self.app.colors[self.bgColor])
         self.text = tk.Label(
             self.backScreen,
             text=self.realText,
             font=("Calibri", 80, "bold"),
-            fg=next(
-                (code for name, code in self.app.colors if name == self.textColor), None
-            ),
-            bg=next(
-                (code for name, code in self.app.colors if name == self.bgColor), None
-            ),
+            fg=self.app.colors[self.textColor],
+            bg=self.app.colors[self.bgColor],
         )
         self.backScreen.pack(fill="both", expand=True)
         self.text.pack(pady=100)
@@ -157,10 +171,10 @@ class GameWindow(tk.Frame):
     def pick_colors(self, random_state=None):
         if random_state:
             random.seed(random_state)
-        self.realText = random.choice([i[0] for i in self.app.colors])
-        self.textColor = random.choice([i[0] for i in self.app.colors])
+        self.realText = random.choice(list(self.app.colors.keys()))
+        self.textColor = random.choice(list(self.app.colors.keys()))
         self.bgColor = random.choice(
-            [i for i in [j[0] for j in self.app.colors] if i != self.textColor]
+            [i for i in self.app.colors.keys() if i != self.textColor]
         )
 
     def check_answer(self):
@@ -179,19 +193,11 @@ class GameWindow(tk.Frame):
         )
         self.pick_colors()
 
-        self.backScreen.config(
-            background=next(
-                (code for name, code in self.app.colors if name == self.bgColor), None
-            ),
-        )
+        self.backScreen.config(background=self.app.colors[self.bgColor])
         self.text.config(
             text=self.realText,
-            fg=next(
-                (code for name, code in self.app.colors if name == self.textColor), None
-            ),
-            bg=next(
-                (code for name, code in self.app.colors if name == self.bgColor), None
-            ),
+            fg=self.app.colors[self.textColor],
+            bg=self.app.colors[self.bgColor],
         )
         self.entry.delete(0, tk.END)
 
@@ -207,11 +213,11 @@ class GameWindow(tk.Frame):
             self.remaining_time -= 1
             self.after(1000, self.countdown)  # Call countdown again after 1 second
         else:
-            self.app.manager.store_user_data(
-                self.user_name,
-                max(self.app.best_score, self.current_score),
-                self.app.trys,
+            self.app.scores[self.user_name]["scores"] = max(
+                self.app.best_score, self.current_score
             )
+            self.app.scores[self.user_name]["trys"] = self.app.trys
+            self.app.save_scores()
             self.app.show_welcome_window()  # Time's up, return to welcome window
 
     def start_game(self):

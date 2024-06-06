@@ -25,11 +25,6 @@ then install the packages listed in **requirements.txt** file:
 ```bash
 pip install -r requirements.txt
 ```
-### Bring up Postgresql
-now using this command you will have an up and running local database in your system to store your, **users**, **scores** and **trys**.
-```bash
-docker compose up -d
-```
 ### Lastly
 finally run the game and enjoy!
 ```bash
