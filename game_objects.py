@@ -101,7 +101,9 @@ class WelcomeWindow(tk.Frame):
 
         if name:
             if not (name in list(self.app.scores.keys())):
-                self.app.score[name] = 0
+                self.app.scores[name] = {}
+                self.app.scores[name]["scores"] = 0
+                self.app.scores[name]["trys"] = 0
                 self.app.save_scores()
             self.app.start_game(name)
 

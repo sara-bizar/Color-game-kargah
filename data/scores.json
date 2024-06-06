@@ -1,1 +1,18 @@
-{"Fatemeh": {"scores": 10, "trys": 9}, "Melika": {"scores": 6, "trys": 3}, "Sara": {"scores": 6, "trys": 3}, "Arman": {"scores": 2, "trys": 1}}
+{
+    "Fatemeh": {
+        "scores": 10,
+        "trys": 9
+    },
+    "Melika": {
+        "scores": 6,
+        "trys": 3
+    },
+    "Sara": {
+        "scores": 6,
+        "trys": 3
+    },
+    "Arman": {
+        "scores": 2,
+        "trys": 1
+    }
+}
